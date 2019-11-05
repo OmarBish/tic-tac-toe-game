@@ -208,7 +208,7 @@ export default {
 		  	this.buildStateSpace(rootNode)
 			console.log('rootNode',rootNode);
 			this.$parent.numberOfComputedNodes = 0;
-			let bestMove = this.findBestMove(rootNode,-10,10)[1];
+			let bestMove = this.findBestMove(rootNode,-100000,100000)[1];
 			console.log("bestMove",bestMove)
 			let change= null;
 			for(let i = 1 ; i <= 9;i++){
