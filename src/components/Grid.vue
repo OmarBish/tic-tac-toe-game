@@ -93,40 +93,6 @@ export default {
   },
 
   methods: {
-
-	  heuristic(){
-		  let xWins=0
-		  let oWins = 0
-		  this.winConditions.forEach(winCond => {
-			  	let oCount = 0;
-				let xCount  = 0;
-				// console.log("path",winCond)
-				for(let i = 0 ; i < 3 ; i++){
-					let state = this.cells[winCond[i]];
-					if( state == 'X'){
-						xCount++;
-						// console.log("xCount",xCount)
-					}
-					if( state == 'O'){
-						oCount++;
-						// console.log("oCount",oCount)
-					}
-				}
-				if(oCount > 0 && xCount == 0){
-					oWins++
-				}
-				if(xCount > 0 && oCount == 0){
-					xWins++
-				}
-				if(oCount == 0 && xCount == 0){
-					oWins++
-					xWins++
-				}
-				// console.log("oWins",oWins)
-				// console.log("xWins",xWins)
-		  });
-		  return oWins - xWins;
-	  },
 	  buildNextLevel(node){
 		let tempPlayer;
 		if(this.checkForWinAlg(node.value.cells)){
