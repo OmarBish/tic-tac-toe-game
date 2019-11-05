@@ -36,6 +36,11 @@
 			})
 
 			Event.$on('freeze', () => this.frozen = true)
+			Event.$on('computerPlayed' , (change)=>{
+				if(change == this.name){
+					this.strike();
+				}
+			});
 		}
 	}
 </script>

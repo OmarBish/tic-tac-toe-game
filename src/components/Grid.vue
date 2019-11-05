@@ -1,7 +1,7 @@
 <template>
-	<div>
+	<div class="board">
 		<div class="gameStatus" :class="gameStatusColor">
-			{{ gameStatusMessage }}
+			{{ gameStatusMessage }}	
 		</div>
 		<table class="grid">
 		  <tr>
@@ -25,10 +25,11 @@
 
 <script>
 import Cell from './Cell.vue'
+import {TreeNode} from '../DS/Tree';
 
 export default {
-	components: { Cell },
-
+  components: { Cell },
+  props:['maxLevel','alg'],
   data () {
     return {
     	// can be O or X
@@ -46,17 +47,17 @@ export default {
     	// no. of moves played by both players in a single game (max = 9)
     	moves: 0,
     	// stores the placement of X and O in cells by their cell number
-			cells: {
-				1: '', 2: '', 3: '',
-				4: '', 5: '', 6: '',
-				7: '', 8: '', 9: ''
-			},
-			// contains all (8) possible winning conditions
-			winConditions: [
-				[1, 2, 3], [4, 5, 6], [7, 8, 9], // rows
-				[1, 4, 7], [2, 5, 8],	[3, 6, 9], // columns
-				[1, 5, 9], [3, 5, 7]             // diagonals
-			],
+		cells: {
+			1: '', 2: '', 3: '',
+			4: '', 5: '', 6: '',
+			7: '', 8: '', 9: ''
+		},
+		// contains all (8) possible winning conditions
+		winConditions: [
+			[1, 2, 3], [4, 5, 6], [7, 8, 9], // rows
+			[1, 4, 7], [2, 5, 8],	[3, 6, 9], // columns
+			[1, 5, 9], [3, 5, 7]             // diagonals
+		],
     }
   },
 
@@ -95,6 +96,9 @@ export default {
   	// changes the active player to the non-active player with the help of the nonActivePlayer computed property
   	changePlayer () {
 			this.activePlayer = this.nonActivePlayer
+			if(this.activePlayer == 'X'){
+				let nextMove = this.findNextMove();
+			}
 		},
 
 		// checks for possible win conditions from the data
@@ -183,6 +187,9 @@ export default {
 </script>
 
 <style>
+.board{
+	max-width: 270px;
+}
 .grid {
 	background-color: #34495e;
 	color: #fff;
