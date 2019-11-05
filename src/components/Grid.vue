@@ -93,6 +93,167 @@ export default {
   },
 
   methods: {
+
+	  heuristic(){
+		  let xWins=0
+		  let oWins = 0
+		  this.winConditions.forEach(winCond => {
+			  	let oCount = 0;
+				let xCount  = 0;
+				// console.log("path",winCond)
+				for(let i = 0 ; i < 3 ; i++){
+					let state = this.cells[winCond[i]];
+					if( state == 'X'){
+						xCount++;
+						// console.log("xCount",xCount)
+					}
+					if( state == 'O'){
+						oCount++;
+						// console.log("oCount",oCount)
+					}
+				}
+				if(oCount > 0 && xCount == 0){
+					oWins++
+				}
+				if(xCount > 0 && oCount == 0){
+					xWins++
+				}
+				if(oCount == 0 && xCount == 0){
+					oWins++
+					xWins++
+				}
+				// console.log("oWins",oWins)
+				// console.log("xWins",xWins)
+		  });
+		  return oWins - xWins;
+	  },
+	  buildNextLevel(node){
+		let tempPlayer;
+		if(this.checkForWinAlg(node.value.cells)){
+			return;
+		}
+		if((node.value.level % 2) != 1){
+			//next round is for the active player
+			tempPlayer = this.activePlayer
+		}else{
+			tempPlayer = this.nonActivePlayer
+		}
+		console.log("level",node.value.level)
+		console.log("tempPlayer",tempPlayer)
+
+			
+		for(let i = 1 ; i <= 9 ; i++){
+			if(!node.value.cells[i]){
+				let  tempCells = Object.assign({},node.value.cells);
+				tempCells[i]=tempPlayer;
+				let nodeData = {
+					cells:tempCells,
+					level:node.value.level+1,
+				}
+				// debugger
+				let tempNode = new TreeNode(nodeData)
+				this.$parent.numberOfNodes += 1
+				node.descendents.push(tempNode)
+			}
+		}
+	  },
+	  checkForWinAlg(cells){
+		for (let i = 0; i < this.winConditions.length; i++) {
+			// gets a single condition wc from the whole array
+			let wc = this.winConditions[i]
+			
+
+			// compares 3 cell values based on the cells in the condition
+			if (this.areEqual(cells[wc[0]], cells[wc[1]], cells[wc[2]])) {
+				return true
+			}
+		}
+	  },
+	  //build state space for min/max Alg
+	  buildStateSpace(rootNode){
+			if(rootNode.value.level>this.maxLevel) return;
+			
+			this.buildNextLevel(rootNode);
+			for(let i = 0 ; i < rootNode.descendents.length;i++){
+				this.buildStateSpace(rootNode.descendents[i])
+			}
+			return rootNode;
+	  },
+	  findBestMove(node,alpha,beta){
+			if(node.descendents.length == 0){
+				return [node.calcHeuristic(),0];
+			}
+			let index;
+			node.beta = beta
+			node.alpha = alpha
+		for(let i = 0 ; i < node.descendents.length;i++){
+			this.$parent.numberOfComputedNodes += 1;
+			let heuristic = this.findBestMove(node.descendents[i],node.alpha,node.beta)
+			// even level -> max 
+			// odd level -> min
+			
+			if(node.value.level % 2){
+				if(node.heuristic == null){
+					node.heuristic = heuristic[0]
+					index = i
+					node.beta = heuristic[0]
+				}else if(node.heuristic>heuristic[0]){
+					node.heuristic = heuristic[0]
+					index = i
+					if(this.alg == "AlphaBeta" && heuristic[0] < node.beta ){
+						node.beta = heuristic[0]
+					}
+				}
+			}else{
+				if(node.heuristic == null){
+					node.heuristic = heuristic[0]
+					index = i
+					node.alpha = heuristic[0]
+				}else if(node.heuristic<heuristic[0]){
+					node.heuristic = heuristic[0]
+					index = i
+					if(this.alg == "AlphaBeta" && heuristic[0] > node.alpha ){
+						node.alpha = heuristic[0]
+					}
+				}
+			}
+			if(this.alg=="AlphaBeta"){
+			  if(node.value.level % 2){
+				 if(node.heuristic < node.alpha){
+					 break;
+				 }
+			  }else{
+ 				if(node.heuristic > node.beta){
+					 break;
+				 }
+			  }
+		  	}
+		}
+		return [node.heuristic,index]
+	  },
+	  findNextMove(){
+		  const rootData = {
+			  	cells:Object.assign({},this.cells),
+				level:0,
+			}
+			this.$parent.numberOfNodes = 0
+			let rootNode = new TreeNode(rootData)
+			this.$parent.numberOfNodes += 1
+		  	this.buildStateSpace(rootNode)
+			console.log('rootNode',rootNode);
+			this.$parent.numberOfComputedNodes = 0;
+			let bestMove = this.findBestMove(rootNode,-10,10)[1];
+			console.log("bestMove",bestMove)
+			let change= null;
+			for(let i = 1 ; i <= 9;i++){
+				if(this.cells[i] != rootNode.descendents[bestMove].value.cells[i]){
+					change = i
+					break;
+				}
+			}
+			Event.$emit('computerPlayed',change)
+		  
+	  },
   	// changes the active player to the non-active player with the help of the nonActivePlayer computed property
   	changePlayer () {
 			this.activePlayer = this.nonActivePlayer
