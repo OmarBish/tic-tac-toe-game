@@ -1,17 +1,45 @@
 <template>
   <div>
-    <div class="scoreBoard">
-      <span>O has {{ wins.O }} wins</span>
-      <h2>Score Board</h2>
-      <span>X has {{ wins.X }} wins</span>
+    <div class="row scoreBoard" >
+      <div class="col">(O) has {{ wins.O }} wins</div>
+      <div class="col" >
+          <label for="sel1">Select Level:</label>
+          <select class="form-control" id="sel1" v-model="level">
+              <option value="0">Easy</option>
+              <option value="1">Medium</option>
+              <option value="2">Hard</option>
+              <option value="3">UnBeatable</option>
+          </select>
+        </div> 
+      <div class="col">(X) has {{ wins.X }} wins</div>
     </div>
-    <div id="app">
-      <div id="details">
-        <h1>Tic Tac Toe</h1>
-        <h2>Match #{{ matches + 1 }}</h2>
+    <div class="container-fluid">
+      <div class="row ">
+        <div class="col text-center">
+          <h1>Tic Tac Toe</h1>
+          <h2>Match #{{ matches + 1 }}</h2>
+        </div>
       </div>
-      <grid></grid>
-      <button class="restart" @click="restart">Restart</button>
+      <div class="row text-center">
+        <div class="col-md-8 col-sm-12 mb-2 text-center" id="app">
+          <grid :alg="alg" :maxLevel="level" class="mx-auto"></grid>
+          <button class="restart wm-270" @click="restart">Restart</button>
+        </div>
+        <div class="col-md-4 col-sm-12 text-center" id="app">
+          <h1>Information</h1>
+          <h3>number of space nodes</h3> 
+          <h5>{{numberOfNodes}}</h5>
+          <h3>number of iterations</h3> 
+          <h5>{{numberOfComputedNodes}}</h5>
+           <div class="form-group">
+              <h3 for="sel1">Selected algorithm:</h3>
+              <select class="form-control" id="sel1" v-model="alg">
+                <option value="MinMax">MinMax</option>
+                <option value="AlphaBeta">AlphaBeta</option>
+              </select>
+            </div> 
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -28,7 +56,11 @@ export default {
       wins: {
         O: 0,
         X: 0
-      }
+      },
+      level:1,
+      alg:"MinMax",
+      numberOfNodes:0,
+      numberOfComputedNodes :0
     }
   },
 
@@ -50,7 +82,7 @@ export default {
 
 <style>
 body {
-  background-color: #fff;
+  background-color: #141311;
   color: #fff;
   font-family: 'Dosis', Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -60,9 +92,7 @@ body {
 }
 
 #app {
-  margin: 0 auto;
-  max-width: 270px;
-  color: #34495e;
+  color: #fff;
 }
 
 h1 {
@@ -91,13 +121,8 @@ h1 {
 }
 
 .scoreBoard {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
   align-items: center;
-  width: 100%;
-  height: 15px;
-  background-color: #16a085;
+  background-color: #a2482e;
   box-shadow: 10px solid #fff;
   padding: 20px;
   overflow-x: none;
@@ -107,10 +132,13 @@ h1 {
   margin: 0px;
 }
 
-.scoreBoard span {
-  float: right;
+.scoreBoard div {
   font-size: 1.5em;
   font-weight: bold;
   margin-left: 20px;
 }
+.wm-270{
+  max-width: 270px;
+}
+  
 </style>
